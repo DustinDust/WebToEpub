@@ -58,10 +58,10 @@ class FetchErrorHandler {
 
     promptUserForRetry(url, wrapOptions, response, failError) {
         let msg;
-        if (wrapOptions.retry.HTTP === 403) { 
-            msg = new Error(UIText.Warning.warning403ErrorResponse(new URL(response.url).hostname) + this.makeFailCanRetryMessage(url, response.status));
+        if (wrapOptions.retry.HTTP === 403) {
+            msg = new Error(UIText.Warning.warning403ErrorResponse(new URL(response.url).hostname) + " " + this.makeFailCanRetryMessage(url, response.status));
         } else {
-            msg = new Error(new Error(this.makeFailCanRetryMessage(url, response.status)));
+            msg = new Error(this.makeFailCanRetryMessage(url, response.status));
         }
         let cancelLabel = this.getCancelButtonText();
         return new Promise((resolve, reject) => {
@@ -289,7 +289,7 @@ let BlockedHostNames = new Set();
 
 class FetchResponseHandler {
     isHtml() {
-        return this.contentType.startsWith("text/html");
+        return this.contentType != null && this.contentType.startsWith("text/html");
     }
 
     setResponse(response) {

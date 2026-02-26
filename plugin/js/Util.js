@@ -986,7 +986,7 @@ const util = (function() {
             const attributesToRemove = [];
 
             for (let i = 0; i < attributes.length; i++) {
-                if (attributes[i].value.trim() === "") {
+                if ((attributes[i].value || "").trim() === "") {
                     attributesToRemove.push(attributes[i].name);
                 }
             }

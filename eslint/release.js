@@ -9,7 +9,7 @@ let isPrerelease = process.argv.includes("pre");
 let commitHash = execSync("git rev-parse --short HEAD").toString().trim();
 let commitLongHash = execSync("git rev-parse HEAD").toString().trim();
 let nameVersion = isPrerelease ? `${version}.pre-${commitHash}` : version;
-let branch = execSync("git rev-parse --abbrev-ref HEAD");
+let branch = execSync("git rev-parse --abbrev-ref HEAD").toString().trim();
 let masterCommitHash = execSync("git rev-parse origin/master").toString().trim();
 
 if (!isPrerelease) {
