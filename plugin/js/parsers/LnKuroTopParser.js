@@ -5,13 +5,16 @@
 
 parserFactory.register("lnkuro.top", () => new LnKuroTopParser());
 
-class LnKuroTopParser extends Parser { // eslint-disable-line no-unused-vars
+class LnKuroTopParser extends Parser {
+    // eslint-disable-line no-unused-vars
     constructor() {
         super();
     }
 
     async getChapterUrls(dom) {
-        return [...dom.querySelectorAll("ul.chapter-list_kuro a")].map(a => util.hyperLinkToChapter(a, null));
+        return [...dom.querySelectorAll("ul.chapter-list_kuro a")].map((a) =>
+            util.hyperLinkToChapter(a, null),
+        );
     }
 
     extractTitle(dom) {
@@ -24,7 +27,10 @@ class LnKuroTopParser extends Parser { // eslint-disable-line no-unused-vars
             throw new Error("Content node not found");
         }
         // clean up unwanted web UI
-        const nav = contentNode.querySelector("#kuro-chapter-nav-wrapper");
+        const nav = contentNode.querySelector(":scope > #kuro-chapter-nav-wrapper");
+        const convertNav = contentNode.querySelector(
+            ":scope > #kuro-chapter-nav-convert-wrapper",
+        );
         const banner = contentNode.querySelector(".lnkuro-banner");
         const top_views = contentNode.querySelector(".post-views_kuro");
         const bottom_views = contentNode.querySelector(":scope > .post-views");
@@ -34,20 +40,24 @@ class LnKuroTopParser extends Parser { // eslint-disable-line no-unused-vars
         if (top_views) contentNode.removeChild(top_views);
         if (bottom_views) contentNode.removeChild(bottom_views);
         if (share) contentNode.removeChild(share);
+        if (convertNav) contentNode.removeChild(convertNav);
 
-        const styledChildren = contentNode.querySelectorAll(':scope > div[style]');
-        styledChildren.forEach(child => child.remove());
+        const styledChildren = contentNode.querySelectorAll(":scope > div[style]");
+        styledChildren.forEach((child) => child.remove());
 
         // return chapter content
         return contentNode;
     }
 
-    extractAuthor(dom) { // eslint-disable-line no-unused-vars
+    extractAuthor(dom) {
+    // eslint-disable-line no-unused-vars
         return "ln_kuro";
     }
 
     findChapterTitle(dom) {
-        return dom.querySelector("header.entry-header h1.entry-title").textContent.trim();
+        return dom
+            .querySelector("header.entry-header h1.entry-title")
+            .textContent.trim();
     }
 
     findCoverImageUrl(dom) {
