@@ -101,6 +101,55 @@ class HakoParser extends Parser {
         throw new Error("can't find chapter content");
     }
 
+    customRawDomToContentStep(chapter, content) {
+        const protectedDiv = chapter.rawDom.querySelector("#chapter-c-protected");
+        if (!protectedDiv) return;
+
+        const algo = protectedDiv.getAttribute("data-s") || "none";
+        const key = protectedDiv.getAttribute("data-k") || "";
+        let chunks;
+        try {
+            chunks = JSON.parse(protectedDiv.getAttribute("data-c") || "[]");
+        } catch (e) {
+            return;
+        }
+        if (!Array.isArray(chunks) || chunks.length === 0) return;
+
+        chunks.sort((a, b) => parseInt(a.substring(0, 4), 10) - parseInt(b.substring(0, 4), 10));
+
+        // Each chunk is decoded independently, then results are joined
+        const decoded = chunks.map(chunk => {
+            const s = chunk.substring(4);
+            if (algo === "xor_shuffle") {
+                return HakoParser.xorShuffleDecode(s, key);
+            } else if (algo === "base64_reverse") {
+                return HakoParser.base64Decode(s.split("").reverse().join(""));
+            } else {
+                return HakoParser.base64Decode(s);
+            }
+        });
+
+        content.innerHTML = decoded.join("");
+    }
+
+    static base64Decode(s) {
+        const binary = atob(s);
+        const bytes = new Uint8Array(binary.length);
+        for (let i = 0; i < binary.length; i++) {
+            bytes[i] = binary.charCodeAt(i);
+        }
+        return new TextDecoder("utf-8").decode(bytes);
+    }
+
+    static xorShuffleDecode(s, key) {
+        const binary = atob(s);
+        const bytes = new Uint8Array(binary.length);
+        for (let i = 0; i < binary.length; i++) {
+            bytes[i] = binary.charCodeAt(i) ^ key.charCodeAt(i % key.length);
+        }
+        return new TextDecoder("utf-8").decode(bytes);
+    }
+
 
 
     // returns promise with the URLs of the chapters to fetch
