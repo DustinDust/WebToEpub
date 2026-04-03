@@ -101,6 +101,13 @@ class HakoParser extends Parser {
         throw new Error("can't find chapter content");
     }
 
+    async fetchImagesUsedInDocument(content, webPage) {
+        // Content is still encrypted at this point; decrypt it first so the
+        // image collector can find the <img> tags that are injected by decryption.
+        this.customRawDomToContentStep(webPage, content);
+        return super.fetchImagesUsedInDocument(content, webPage);
+    }
+
     customRawDomToContentStep(chapter, content) {
         const protectedDiv = chapter.rawDom.querySelector("#chapter-c-protected");
         if (!protectedDiv) return;
